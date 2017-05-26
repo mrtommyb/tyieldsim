@@ -1,0 +1,154 @@
+\documentclass[iop,apj]{emulateapj}
+\usepackage{amsmath,amssymb,amstext}
+
+\usepackage[breaklinks,colorlinks,citecolor=blue,linkcolor=magenta]{hyperref} 
+\renewcommand*{\sectionautorefname}{Section}
+\usepackage[all]{hypcap} %Links go to figures; breaks on deluxetables (use \capstartfalse \capstarttrue to fix it)
+
+\usepackage{aas_macros}
+\usepackage{natbib}
+\bibliographystyle{apj}
+
+\shorttitle{The TESS Exoplanet Yield}
+\shortauthors{T. Barclay \& E. V. Quintana}
+
+\begin{document}
+
+\title{An estimate of the exoplanet yield from the Transiting Exoplanet Survey Satellite (TESS) Mission}
+
+% \author{
+% Thomas Barclay \altaffilmark{1,2}, 
+% Elisa V. Quintana\altaffilmark{1} 
+% }
+
+% \altaffiltext{1}{NASA Ames Research Center, M/S 244-30, Moffett Field, CA 94035, USA}
+% \altaffiltext{2}{Bay Area Environmental Research Institute, 625 2nd St. Ste 209, Petaluma, CA 94952, USA}
+
+
+
+
+ \author{Thomas Barclay\altaffilmark{1}}
+ \author{Elisa Quintana}
+% \affil{Bay Area Environmental Research Institute}
+ \affil{NASA Ames Research Center, M/S 244-30, Moffett Field, CA 94035, USA}
+\altaffiltext{1}{Bay Area Environmental Research Institute, 625 2nd St. Ste 209, Petaluma, CA 94952, USA}
+
+% \affil{NASA Ames Research Center, M/S 244-30, Moffett Field, CA 94035, USA}
+
+\begin{abstract}
+In the coming years NASA will launch the Transiting Exoplanet Survey Satellite (TESS) with the goal of detecting terrestrial-mass planets orbiting stars bright enough for mass determination via ground-based radial velocity observations. Here we estimate how many exoplanet the TESS mission will to detect, the physical properties of these detected planets and the properties of the stars that those planets orbit. To make these predictions we simulation a population of stars that will be observed by TESS and then used exoplanet occurrence rate estimates to place zero or more exoplanets around these these. We then use a sensitivity curve for TESS to predict whether these planets would be detected. We predict that TESS will detect 4300 planets in total with an $I$-band magnitude between 4 and 13 of which 1800 will be smaller than 4 $R_\oplus$ and orbiting stars bright than $I$=10 and around 40 will be within 30 pc of earth. In total 35\% of the planets that TESS finds will orbit G-dwarf stars, 20\% will be around K-dwarf stars and 10\% around M-dwarfs with the remaining orbiting hotter stars, we also estimate that XX planets orbiting red-giant stars will detected via TESS full-frame image data.  Finally, we predict that about one in five of all exoplanets detected by TESS will be at the north or southern galactic poles. Our detection yield differs from previous TESS planet yield estimates in at least one crucial way: we predict a much larger number of detections of planets orbiting cool stars. We attribute this to a difference in the way we account for planets orbiting in multi-planets systems around cool stars where the number of planets in short orbital periods is significantly higher than for hotter stars.
+\end{abstract}
+
+\keywords{keywords}
+\maketitle
+
+\section{Introduction}
+While we have known that planets orbit stars anther than the Sun since the 1990's (cite canadians, latham, neutron star planets, mayor, marcy), it is only with the launch of the Kepler spacecraft in 2009 (cite borucki and koch) that we have been able to estimate the occurrence terrestrial worlds. While there is not a firm consensus on the details of how common planets are as a function of size and orbital period (cite lots of people) it is clear that exoplanets are fairly commonplace, particularly around the coolest of stars (cite Dressing).
+
+Although we have a handle on the frequency of planets -- at least planets with orbital periods of less than a few hundred days -- and we know that these planets must orbit stars that have properties that make them readily characterizable, we have yet to detect these planets. The K2 mission \citep{howell14} is currently detecting planets orbiting 
+
+The Transiting Exoplanet Survey Satellite (TESS), planned for launch in late 2017, will rectify this issue and detect terrestrial planets orbiting stars bright enough that the planet mass may be measured from precision radial velocity (RV) observations. Armed with the radius from TESS and mass from RV, a crude estimate of a planets composition can be made. 
+
+Paragraph on current and future searches for exoplanet, focus on TESS
+
+paragraph on why we want to estimate the yield
+
+paragraph on how we might do this
+
+A paragraph addressing why do we want an alternative to the sullivan paper
+
+\section{A Monte Carlo Procedure for Estimating the Exoplanet Yield}
+To predict the number and characteristics of the planets that may be detected by the TESS mission we built a Monte Carlo framework to assign planets to stars and to then assess whether these planets would be detected by TESS. We caution the reader that there are numerous simplification in the approach we take, some of which are discussed in \ref{sec:caveats}.
+
+\subsection{Building a star and planet sample}
+We built a populations of stars that TESS will target using the Bessancon galaxy model (cite). The TESS planet search target list will consist of main sequence stars with $I\in\left[4,13\right]$ \citep{ricker14} so we restricted our galaxy model query to stars between these magnitude ranges (planets orbiting red giants are discussed explicitly in Section~\ref{sec:redgiants}).
+
+We queried the galaxy model using \texttt{astroquery} in 80 separate position that correspond to the centers of the TESS sectors \citep[cf. Figure 7 in ][]{ricker14}. There are 13 equally spaced sectors centers: 13 each at +18, -18, +42, -42, +66, -66 degrees in ecliptic coordinates, and one each at +90 and -90 degrees. 
+
+We simulated a population of stars in an 8 square degree field of view at each sector center and then sampled with replacement from this population to extrapolate to a population of stars in the full sector, assuming that the stellar population varies smoothly over the sector. The sectors with centers at $\pm$18 degrees from the ecliptic uniquely subtend 24x24 degrees so we draw each star on average $(24x24)/8=72$ times. Sectors further from the Ecliptic plane start to overlap with previously observed sectors. To avoid counting overlapping regions of the sky multiple times we split the overlapping area evenly between the two adjacent sectors. For the sectors at $\pm$42 degrees the area is 490 deg$^2$. and at $\pm$66 degrees is 268 deg$^2$. The two sectors at the ecliptic poles at 576 deg$^2$.
+
+To each star in our list we assign one or more planet. The number of planets assigned to each star is drawn from a Poisson distribution. The mean (referred to here as $\lambda$) of the Poisson distribution we used differs between OBAFGK stars and M stars because there is evidence from multiple groups that M-stars host more planets on short orbital periods \citep{threecitations,burke15}. For OBAFGK we use the average number of planets per star with orbital periods of $<$85 days of $\lambda=0.689$ \citep{fressin13}, while for M-stars $\lambda=2.5$ planets are reported with orbital periods $<$200 days \citep{dressin15}. 
+
+Each planet is then assigned six physical properties drawn at random: an orbital period, a radius, an eccentricity, a periastron angle, an inclination to our line of sight and a mid-time of first transit. The orbital period and radius are selected using the exoplanet occurrence rate estimate of \citet{fressin13} for OBAFGK stars and \citet{dressin15} for M-stars. Both \citet{fressin13} and \citet{dressin15} report occurrence rates in period/radius bins. We at random from each of these bins with the probability to draw from a given bin weighted by the occurrence rate in that bin divided by the total occurrence rate of planets. For example, \citet{dressin15} report a 4.3\% occurence rate for planets with radii 1.25--2.0 $R_\oplus$ and orbital period 10--17 days so in our simulation we draw planets from that bin with a frequency of 4.3 divided by the total occurrence rate in all bins. We normalize by the total occurrence rate of planets since we are already taking account of system with zero or multiple planets in our Poisson draw discussed in the previous paragraph. Once we know which bin to select a planet from we draw from a uniform distribution over the bin area to select a orbital period-radius pair.
+
+Following \citet{kipping14}, the orbital eccentricity of the planets is selected from a Beta distribution, with parameters $\alpha=1.03$ and $\beta=13.6$, which \citet{vaneylen15} found was appropriate for transiting planets. The periastron angle is drawn from a uniform distribution with support from $-\pi$ to $+\pi$. The cosine of inclination is chosen to be uniform between zero and one. Planets in multiple-planet systems are assumed to be coplanar - i.e. they have the same $\cos{i}$ which is appropriate for our purposed given the coplanarity of exoplanetary disks have been found to be very small \citep{someone}, quote a number here. Finally, we chose a time of first transit to be uniform between zero and the orbital period -- note that this can be greater than the total observation duration in which case no transit is observed
+
+We track the duration that each planet and star is observed for by subdividing each sector. In sectors at $\pm$13
+ degrees all stars are observed fr 27 days, in the sectors at $\pm$42 and degrees we randomly select XX\% of stars to be observed for 54 days days while the remaining are observed for 27 days -- this percentage reflects the proportion of stars that will be observed continuously for two months with two different pointing owing to overlapping sectors. For sectors at $\pm$66 we select XX\% to be observed for 54 days and the remaining at 27 days. This neglects the fact that a small proportion of stars are observed over three months for a total of 81 days. However, this number is small geometric probability to transit gets very small at these long orbital periods, so instead these stars fall into the 54 day observations region. Finally, two sectors at the poles are continuously observed for 351 days.
+
+\subsection{Detecting planets}
+Each planet in turn is then assessed as to whether it would be detected transiting by TESS. To be detected the transit depth $\delta_t$ must be greater than the noise threshold for detection $\sigma_t$. We approximate the value of $\delta_t$ in parts per million from
+\begin{equation}
+\delta_t = \left(\frac{R_p}{R_\star}\right)^2 \times 10^6
+\end{equation}
+where $R_p$ is the planet radius is $R_\star$ is the stellar radius and both $R_p$ and $R_\star$ are in the same units.
+
+Calculating $\sigma_t$ is a little more tricky. We first estimate the 1-hour integrated noise level of TESS as a function of $I$-band magnitude ($\sigma_{\textrm{1hr}}$) by reproducing the curve shown in Figure 8 of \citet{ricker14} which ranges from 75 ppm for stars brighter than $I=7$ to around 1000 ppm for stars at $I=13$. We then multiply this noise level by several parameter to reach of noise detection threshold, $\sigma_t$ where the parameters making up $\sigma_t$ are
+\begin{equation}
+\sigma_t = \sigma_{\textrm{1hr}} \times \tau^{0.5} \times N_t \times \frac{1}{\sigma_T}.
+\label{eq:noise}
+\end{equation}
+where $\tau$ is the total duration of the transit in hours, $N_t$ is the number of transit observed and $N_t$ is the signal-to-noise threshold required for detection.
+
+The total transit duration is approximated using the equation
+\begin{equation}
+put equation here
+\end{equation}
+which is take from \citet{winn13} and define the variables. If the impact parameter is $>1.0$ the duration will be less than zero indicating that no transit occurs.
+
+The number of transits observed is calculated by counting the number of transit that fall into the observation window for each planet, using the time of first transit and the orbital period. Some planets have a time of first transit outside of the observing window and therefore have $N_t=0$. $\sigma_T$ in Equation~\ref{eq:noise} is the sigal-to-noise threshold that is required to detect a planet. The Kepler pipeline uses a value of approximately 7.1 \citep{a bunch of jenkins papers,jenkins15}, however, the Kepler team have found that the number of false alarms (transit detection due to non-astrophysical correlated noise) increase dramatically between 10 and 7.1 \citet{mullally15}, therefore in this work we conservatively set $N_t=10$. 
+
+The next step we take to creating our population of detected planets is to cull those that will not be observed to transit or are unphysical. This includes planets that have an impact parameter $>1.0$ (this will remove a small number of grazing transits but these are difficult to distinguish from eclipsing binaries anyway \citep{someone}). We also cull planets with orbital semi-major axes small than the stellar radius. Finally, we cull planets with $<3$ observed transits because these are very difficult to uniquely identify using TESS data alone. This may be somewhat overly conservative given planets have been detected using K2 mission data \citep{howell14} with one \citep{vanderburg14} and two \citep{crossfield} transits but these two cases occur in systems where additional space-based follow-up assets were exploited or there were two other planets in the system so the validity of the planets was less ambiguous \citep{lissauer13}.
+
+With values for $\sigma_t$ and $\delta_t$ in hand, we create a list of those planets with $\sigma_t\geq \delta_t$ and class these planets at detected. We then do a small amount of culling to remove outlier cases
+
+\section{Simulation Results}
+We predict that using the target strategy we assume that TESS will detect 
+
+\subsection{Planet properties distribution}
+
+
+\subsection{Stellar properties distribution}
+\begin{itemize}
+\item how many around cool stars
+\item how many around red giants giants
+\item distances
+\item hr diagram
+\end{itemize}
+
+
+\section{Discussion of implications}
+
+\subsection{Caveats}\label{sec:caveats}
+\begin{itemize}
+\item The occurrence rate from Dressing and Fressin is correct in the domain where TESS is sensitive to planets
+\item The occurrence rate is uniform in the bins reported by Fressin and Dressing - however for Fressin largest bin we make the occurrence uniform in log
+\item That the distribution of stars is uniform within each 24x24 CCD is homogeneous
+\item That stars have uniform brightness across their disk (i.e. no limb darkening)
+\item The transits ingress and egress in instantaneous.
+\item WE assume an eccentricity distribution from Van Eylen 2015. Alpha=1.03, beta=13.6
+\item We assume that the occurence rate in three bins in Dressing 15 is the same as for planets in the larger bin - that is, 0.5-1 Rearth at 33.1|60.3|109.9|200 are copied from 1.0-1.5 Rearth.
+\item planets in the same system are coplanar
+\item that period and radius between planets in the same system are not correlated
+\item the occurrence rates of planets orbiting red giants is the same as for solar-like stars
+\end{itemize}
+
+
+Things to look into
+\begin{itemize}
+\item Planet orbiting red giants
+\item changing the Ntransits requirement to 2 and 1
+\item changing the noise requirement from 10 to 7
+\item changing the magnitude limit from 13 to ??
+\item tess working group is likely to limit I<=12 and spectype later than F5.
+\end{itemize}
+
+\section{Conclusions}
+
+\acknowledgments{
+  Acknowledgments. 
+}
+
+\bibliography{biblio}
+
+\end{document}
