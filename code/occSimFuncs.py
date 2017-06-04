@@ -1,8 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from numpy import random
-from numpy import ma
+# from numpy import ma
 from scipy.interpolate import interp1d
 
 msun = 1.9891E30
@@ -10,47 +10,51 @@ rsun = 695500000.
 G = 6.67384E-11
 AU = 149597870700.
 
-def per2ars(per,mstar,rstar):
+
+def per2ars(per, mstar, rstar):
     per_SI = per * 86400.
     mass_SI = mstar * msun
-    a3 = per_SI**2 * G * mass_SI   / (4 * np.pi**2)
-    return a3**(1./3.) / (rstar*rsun)
+    a3 = per_SI**2 * G * mass_SI / (4 * np.pi**2)
+    return a3**(1. / 3.) / (rstar * rsun)
 
-def get_duration(per,ars,cosi=0.0,b=0,rprs=0.0):
+
+def get_duration(per, ars, cosi=0.0, b=0, rprs=0.0):
     """
     returns the transit duration in days
     """
-    part1 = (per/np.pi)
-    part2 = 1./ ars 
-    part3 = (1+rprs)**2 - b**2
+    part1 = (per / np.pi)
+    part2 = 1. / ars
+    part3 = np.sqrt((1 + rprs)**2 - b**2)
     part4 = np.sqrt(1 - cosi**2)
     duration = part1 * np.arcsin(part2 * part3 / part4)
 
-
     return duration
+
 
 def get_transit_depth(Prad, rstar_solar):
     """
     returns transit depth in ppm
     """
-    tdep = (Prad*0.009155 / rstar_solar)**2 * 1.E6 #ppm
+    tdep = (Prad*  0.009155 / rstar_solar)**2 * 1.E6 #ppm
     return tdep
 
+
 def get_rprs(Prad, rstar_solar):
-    return (Prad*0.009155) / rstar_solar
+    return (Prad * 0.009155) / rstar_solar
+
 
 def Dressing_select(nselect=1):
-    #create a pot for dressing numbers (balls)
+    # create a pot for dressing numbers (balls)
     balls = np.array([])
     # there are 15 pots total of 1000 balls
     # pot zero means no planet
     p0 = np.zeros(91)
-    balls = np.r_[balls,p0]
-    #pot 1 contains rp=0.5-0.7, p=0.68-10
+    balls = np.r_[balls, p0]
+    # pot 1 contains rp=0.5-0.7, p=0.68-10
     p1 = np.zeros(14) + 1
-    #pot 2 contains rp=0.7-1.0, p=0.68-10
+    # pot 2 contains rp=0.7-1.0, p=0.68-10
     p2 = np.zeros(109) + 2
-    #pot 3 contains rp=1.0-1.4, p=0.68-10
+    # pot 3 contains rp=1.0-1.4, p=0.68-10
     p3 = np.zeros(108) + 3
     #pot 4 contains rp=1.4-2.0, p=0.68-10
     p4 = np.zeros(80) + 4
@@ -655,26 +659,29 @@ def Fressin13_select(nselect=1):
 
     return radius, period
 
+
 def TESS_noise_1h(mag):
     """
     returns noise in ppm for a transit of 1 hours duraton
     """
-    mag_level, noise_level = np.genfromtxt('TessNoise_1h.csv', delimiter=',',unpack=True,
-        comments='#')
-    
-    mag_interp = interp1d(mag_level,noise_level,
-                          kind='cubic')
+    mag_level, noise_level = np.genfromtxt('TessNoise_1h.csv', delimiter=',',
+                                           unpack=True,
+                                           comments='#')
+
+    # we probably shouldn't trust any extrapolated values
+    # but it's all guess work at this stage anyway
+    mag_interp = interp1d(mag_level, noise_level,
+                          kind='cubic', fill_value='extrapolate')
     return mag_interp(mag)
 
 
-#def isDetected(constants,starprop,planetprop):
+# def isDetected(constants,starprop,planetprop):
 
 
-
-def nearly_equal(a,b,sig_fig=3):
-    return ( a==b or 
-             int(a*10**sig_fig) == int(b*10**sig_fig)
-           )
+def nearly_equal(a, b, sig_fig=3):
+    return (a == b or
+            int(a * 10**sig_fig) == int(b * 10**sig_fig)
+            )
 
 
 

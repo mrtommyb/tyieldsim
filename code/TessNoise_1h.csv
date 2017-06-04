@@ -2,7 +2,20 @@
 ### I used WebPlotDigitizer to pull the data out of the figure
 ### This is the CDPP in ppm in one hour.
 ### I've added a lower bounding value because I think it's justified
--100, 63.61
+### I've also extrapolated beyond 18th mag, this looks reasonable, I used a UnivariateSpline
+-2.0, 63.61
+-1.5, 63.61
+-1.0, 63.61
+-0.5, 63.61
+0.0, 63.61
+1.0, 63.61
+1.5, 63.61
+2.0, 63.61
+2.5, 63.61
+3.0, 63.61
+3.5, 63.61
+4.0, 63.61
+4.5, 63.61
 5.005, 63.61
 5.239, 63.61
 5.505, 64.88
