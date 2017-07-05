@@ -664,7 +664,7 @@ def TESS_noise_1h(mag):
     """
     returns noise in ppm for a transit of 1 hours duraton
     """
-    mag_level, noise_level = np.genfromtxt('TessNoise_1h.csv', delimiter=',',
+    mag_level, noise_level = np.genfromtxt('TessNoise_1h_v2.csv', delimiter=',',
                                            unpack=True,
                                            comments='#')
 
