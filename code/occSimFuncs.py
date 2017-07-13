@@ -4,6 +4,7 @@ import numpy as np
 from numpy import random
 # from numpy import ma
 from scipy.interpolate import interp1d
+import pandas as pd
 
 msun = 1.9891E30
 rsun = 695500000.
@@ -684,7 +685,53 @@ def nearly_equal(a, b, sig_fig=3):
             )
 
 
+def component_noise(tessmag, readmod=1, zodimod=1):
+    sys = 59.785
+    star_mag_level, star_noise_level = np.array([
+        [4.3885191347753745, 12.090570910640581],
+        [12.023294509151416, 467.96434635620614],
+        [17.753743760399338, 7779.603209291808]]).T
+    star_pars = np.polyfit(star_mag_level, np.log10(star_noise_level), 1)
+    zodi_mag_level, zodi_noise_level = np.array([
+        [8.686356073211314, 18.112513551189224],
+        [13.08901830282862, 688.2812796087189],
+        [16.68801996672213, 19493.670323892282]]).T
+    zodi_pars = np.polyfit(zodi_mag_level, np.log10(zodi_noise_level), 1)
+    read_mag_level, read_noise_level = np.array([
+        [8.476705490848586, 12.31474807751376],
+        [13.019134775374376, 522.4985702369348],
+        [17.841098169717142, 46226.777232915076]]).T
+    read_pars = np.polyfit(read_mag_level, np.log10(read_noise_level), 1)
+    
+    c1, c2, c3, c4 = (10 ** (tessmag * star_pars[0] + star_pars[1]), 
+                      10 ** (tessmag * zodi_pars[0] + zodi_pars[1]),
+                      10 ** (tessmag * read_pars[0] + read_pars[1]), sys)
+    
+    return np.sqrt(c1**2 + (readmod*c2)**2 + (zodimod*c3)**2 + c4**2)
 
 
+def make_allplanets_df_vec(df,starid_zp):
+    # lets refector the above code to make it array operations
+    totalRows = df.loc[:, 'Nplanets'].sum()
 
+    df.loc[:, 'planetRadius'] = pd.Series()
+    df.loc[:, 'planetPeriod'] = pd.Series()
+    df.loc[:, 'starID'] = pd.Series()
+
+    radper_dressing = Dressing15_select(totalRows)
+    radper_fressin = Fressin13_select(totalRows)
+
+    #we need an array of indices
+    totalRows = df.loc[:, 'Nplanets'].sum()
+    rowIdx = np.repeat(np.arange(df.shape[0]),np.array(df.Nplanets.values))
+
+    newdf = df.iloc[rowIdx]
+    newdf.loc[:, 'starID'] = rowIdx + starid_zp
+
+
+    newdf.loc[:,'planetRadius'] = np.where(newdf.isMdwarf,radper_dressing[0],radper_fressin[0])
+    newdf.loc[:,'planetPeriod'] = np.where(newdf.isMdwarf,radper_dressing[1],radper_fressin[1])
+    newdf.set_index(np.arange(newdf.shape[0]), inplace=True)
+
+    return newdf, newdf.starID.iloc[-1]
 
