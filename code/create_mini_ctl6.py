@@ -19,25 +19,25 @@ def select_stars(df, selectnum, selectpoles):
     espace = np.diff(eloop)[0]  # get space in degrees
 
     # poles first
-    mn = (df.ECLAT >= 78)
+    mn = (df.ECLAT >= 74)
     selectthese = df.loc[mn].sort_values('PRIORITY').iloc[-selectpoles:].index
     df.loc[df.index.isin(selectthese), 'SELECTED'] = True
 
-    mn = (df.ECLAT <= -78)
+    mn = (df.ECLAT <= -74)
     selectthese = df.loc[mn].sort_values('PRIORITY').iloc[-selectpoles:].index
     df.loc[df.index.isin(selectthese), 'SELECTED'] = True
 
     for elon in eloop[:-1]:
         # southern hemisphere
         ms = ((df.ECLONG >= elon) & (df.ECLONG < elon + espace) &
-              (df.ECLAT <= -6) & (df.ECLAT > -78))
+              (df.ECLAT <= -6) & (df.ECLAT > -74))
         selectthese = df.loc[ms].sort_values(
             'PRIORITY').iloc[-selectnum:].index
         df.loc[df.index.isin(selectthese), 'SELECTED'] = True
 
     #     # northern hemisphere
         mn = ((df.ECLONG >= elon) & (df.ECLONG < elon + espace) &
-              (df.ECLAT >= 6) & (df.ECLAT < 78))
+              (df.ECLAT >= 6) & (df.ECLAT < 74))
         selectthese = df.loc[mn].sort_values(
             'PRIORITY').iloc[-selectnum:].index
         df.loc[df.index.isin(selectthese), 'SELECTED'] = True
@@ -68,13 +68,16 @@ def get_camera(df):
 
 
 if __name__ == '__main__':
-    fn = '/Users/tom/Dropbox/TIC5/ctl.csv'
+    fn = '/Users/tom/Dropbox/TIC6/CTL6/all.csv'
 
     header = [
-        'RA', 'DEC', 'ECLONG', 'ECLAT', 'V', 'Ks',
-              'TESSMAG', 'TEFF', 'RADIUS', 'MASS', 'CONTRATIO', 'PRIORITY',
+        'RA', 'DEC', 'TESSMAG', 'TEFF', 
+        'PRIORITY', 'RADIUS', 'MASS', 'CONTRATIO', 
+        'ECLONG', 'ECLAT', 'V', 'Ks', 'TICID',
     ]
-    usecols = [13, 14, 30, 60, 64, 87, 70, 72, 84, 26, 27, 46]
+    usecols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 16, 19, 33]
+
+
 
     print()
     print('doing nominal')
@@ -82,7 +85,7 @@ if __name__ == '__main__':
     df = select_stars(df, selectnum=8200, selectpoles=6000)
     df = get_camera(df)
     selected = df[(df.SELECTED) & (df['obs_len'] > 0.0)]
-    selected.to_csv('../data/selectedreal5-Nominal-v4.csv.bz2',
+    selected.to_csv('../data/selectedreal6-Nominal-v1.csv.bz2',
                     compression='bz2')
 
     print()
@@ -91,7 +94,7 @@ if __name__ == '__main__':
     df = select_stars(df, selectnum=2200, selectpoles=12000)
     df = get_camera(df)
     selected = df[(df.SELECTED) & (df['obs_len'] > 0.0)]
-    selected.to_csv('../data/selectedreal5-LongerBaseline-v4.csv.bz2',
+    selected.to_csv('../data/selectedreal6-LongerBaseline-v1.csv.bz2',
                     compression='bz2')
 
     print()
@@ -100,8 +103,20 @@ if __name__ == '__main__':
     df = select_stars(df, selectnum=11200, selectpoles=3000)
     df = get_camera(df)
     selected = df[(df.SELECTED) & (df['obs_len'] > 0.0)]
-    selected.to_csv('../data/selectedreal5-MoreStars-v4.csv.bz2',
+    selected.to_csv('../data/selectedreal6-MoreStars-v1.csv.bz2',
                     compression='bz2')
+
+    print()
+    print('doing entire CTL')
+    df = pd.read_csv(fn, names=header, usecols=usecols)
+    df = select_stars(df, selectnum=1000000000, selectpoles=1000000000)
+    df = get_camera(df)
+    selected = df[(df.SELECTED) & (df['obs_len'] > 0.0)]
+    selected.to_csv('../data/allCTL6-v1.csv.bz2',
+                    compression='bz2')
+
+
+
 
     # print()
     # print('doing cvz south')
